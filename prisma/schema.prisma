@@ -1,0 +1,24 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model SportSpace {
+  id       String     @id @default(uuid())
+  logo     String
+  name     String
+  link     String
+  coords   Json
+  price    Json
+  availability Int
+  address  String
+  markerLogo String
+  maxAvailable Int
+}
