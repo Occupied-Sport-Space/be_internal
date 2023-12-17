@@ -4,7 +4,9 @@ import { Server } from 'socket.io'
 import { PrismaClient } from '@prisma/client'
 import { setupSocketHandlers } from './handlers/socket'
 import { setupRestHandlers } from './handlers/rest'
+import dotenv from 'dotenv'
 
+dotenv.config()
 const prisma = new PrismaClient()
 const PORT = 8000
 
