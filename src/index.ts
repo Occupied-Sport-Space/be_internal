@@ -12,6 +12,7 @@ const PORT = 8000
 
 const main = async () => {
     const app = express()
+    app.use(express.json())
     const httpServer = createServer(app)
     const io = new Server(httpServer)
 

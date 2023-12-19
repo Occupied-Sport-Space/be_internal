@@ -22,15 +22,21 @@ export const setupSocketHandlers = (io: Server, prisma: PrismaClient) => {
                     if (space) {
                         const { availability } = space
 
-                        if (count !== availability) {
-                            console.log('new count: ', count)
+                        if (
+                            availability &&
+                            count !== (availability as number[])[cameraId]
+                        ) {
                             prisma.sportSpace
                                 .update({
                                     where: {
                                         id: spaceId,
                                     },
                                     data: {
-                                        availability: count,
+                                        availability: (
+                                            availability as number[]
+                                        ).map((num, i) =>
+                                            i !== cameraId ? num : count
+                                        ),
                                     },
                                 })
                                 .then((newSpace) => {
