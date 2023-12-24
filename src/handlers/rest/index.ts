@@ -39,6 +39,40 @@ export const setupRestHandlers = (app: Express, prisma: PrismaClient) => {
         res.send(spaces)
     })
 
+    app.patch('/user', verifyToken, async (req: any, res) => {
+        const { name, email } = req.body
+
+        if (!(name || email)) {
+            return res.status(400).send({
+                error: 'AT_LEAST_ONE_INPUT_REQUIRED',
+            })
+        }
+
+        const user = await prisma.user.findFirst({
+            where: {
+                id: req.user.user_id,
+            },
+        })
+
+        if (!user) {
+            return res.status(400).send({
+                error: 'USER_NOT_FOUND',
+            })
+        }
+
+        const updatedUser = await prisma.user.update({
+            where: {
+                id: req.user.user_id,
+            },
+            data: {
+                name: name ? name : user.name,
+                email: email ? email : user.email,
+            },
+        })
+
+        return res.status(200).send(updatedUser)
+    })
+
     app.patch('/add-favorite', verifyToken, async (req: any, res) => {
         const { spaceId } = req.body
 
