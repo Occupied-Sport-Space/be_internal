@@ -148,6 +148,7 @@ export const setupRestHandlers = (app: Express, prisma: PrismaClient) => {
                     email: email.toLowerCase(),
                     password: encryptedUserPassword,
                     favorites: [],
+                    token: '',
                 },
             })
 

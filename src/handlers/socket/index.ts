@@ -38,6 +38,8 @@ export const setupSocketHandlers = (io: Server, prisma: PrismaClient) => {
                             .then((newSpace) => {
                                 socket.broadcast.emit('update', newSpace)
                             })
+                    } else {
+                        console.log('Space not found')
                     }
                 })
         })
