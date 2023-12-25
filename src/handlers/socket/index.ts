@@ -12,6 +12,7 @@ export const setupSocketHandlers = (io: Server, prisma: PrismaClient) => {
         console.log('user connected!')
 
         socket.on('count', ({ count, spaceId, cameraId }: CountInstance) => {
+            console.log('count received', count, spaceId, cameraId)
             prisma.sportSpace
                 .findFirst({
                     where: {
@@ -21,28 +22,22 @@ export const setupSocketHandlers = (io: Server, prisma: PrismaClient) => {
                 .then((space) => {
                     if (space) {
                         const { availability } = space
-
-                        if (
-                            availability &&
-                            count !== (availability as number[])[cameraId]
-                        ) {
-                            prisma.sportSpace
-                                .update({
-                                    where: {
-                                        id: spaceId,
-                                    },
-                                    data: {
-                                        availability: (
-                                            availability as number[]
-                                        ).map((num, i) =>
-                                            i !== cameraId ? num : count
-                                        ),
-                                    },
-                                })
-                                .then((newSpace) => {
-                                    socket.broadcast.emit('newCount', newSpace)
-                                })
-                        }
+                        prisma.sportSpace
+                            .update({
+                                where: {
+                                    id: spaceId,
+                                },
+                                data: {
+                                    availability: (
+                                        availability as number[]
+                                    ).map((num, i) =>
+                                        i !== cameraId ? num : count
+                                    ),
+                                },
+                            })
+                            .then((newSpace) => {
+                                socket.broadcast.emit('update', newSpace)
+                            })
                     }
                 })
         })
