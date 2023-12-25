@@ -73,6 +73,60 @@ export const setupRestHandlers = (app: Express, prisma: PrismaClient) => {
         return res.status(200).send(updatedUser)
     })
 
+    app.post('/spaces', verifyToken, async (req: any, res) => {
+        const {
+            address,
+            markerLogo,
+            logo,
+            maxAvailable,
+            cameraCount,
+            name,
+            link,
+            coords,
+            price,
+        } = req.body
+
+        if (
+            !(
+                address &&
+                markerLogo &&
+                logo &&
+                maxAvailable &&
+                cameraCount &&
+                name &&
+                link &&
+                coords &&
+                price
+            )
+        ) {
+            return res.status(400).send({
+                error: 'ALL_INPUTS_REQUIRED',
+            })
+        }
+
+        if (req.user.email !== 'serapinaspijus@gmail.com') {
+            return res.status(400).send({
+                error: 'UNAUTHORIZED',
+            })
+        }
+
+        const space = await prisma.sportSpace.create({
+            data: {
+                address,
+                markerLogo,
+                logo,
+                maxAvailable,
+                availability: new Array(cameraCount).fill(0),
+                name,
+                link,
+                coords,
+                price,
+            },
+        })
+
+        return res.status(200).send(space)
+    })
+
     app.patch('/add-favorite', verifyToken, async (req: any, res) => {
         const { spaceId } = req.body
 
