@@ -265,6 +265,10 @@ export const setupRestHandlers = (app: Express, prisma: PrismaClient) => {
                 // user
                 return res.status(200).json(updatedUser)
             }
+
+            return res.status(400).send({
+                error: 'INVALID_CREDENTIALS',
+            })
         } catch (err) {
             return res.status(400).send({
                 error: 'INVALID_CREDENTIALS',
