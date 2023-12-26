@@ -40,11 +40,11 @@ export const setupRestHandlers = (app: Express, prisma: PrismaClient) => {
     })
 
     app.patch('/user', verifyToken, async (req: any, res) => {
-        const { name, email } = req.body
+        const { name } = req.body
 
-        if (!(name || email)) {
+        if (!name) {
             return res.status(400).send({
-                error: 'AT_LEAST_ONE_INPUT_REQUIRED',
+                error: 'NAME_REQUIRED',
             })
         }
 
@@ -66,7 +66,6 @@ export const setupRestHandlers = (app: Express, prisma: PrismaClient) => {
             },
             data: {
                 name: name ? name : user.name,
-                email: email ? email : user.email,
             },
         })
 
