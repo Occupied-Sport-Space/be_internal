@@ -49,6 +49,8 @@ export const setupSocketHandlers = (io: Server, prisma: PrismaClient) => {
                                 console.log('Space not found')
                             }
                         })
+                } else {
+                    socket.disconnect();
                 }
             }
         )
