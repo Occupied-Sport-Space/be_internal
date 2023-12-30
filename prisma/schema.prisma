@@ -21,7 +21,7 @@ model SportSpace {
   address         String
   markerLogo      String
   maxAvailable    Int
-  planningOnGoing Int
+  planningOnGoing Json
   timeOut         Int
 }
 

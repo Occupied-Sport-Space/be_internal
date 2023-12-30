@@ -60,12 +60,23 @@ export const setupRestHandlers = (
             })
         }
 
+        if (
+            ((space.planningOnGoing as string[]) || []).includes(req.user.email)
+        ) {
+            return res.status(400).send({
+                error: 'USER_ALREADY_LISTED',
+            })
+        }
+
         const updatedSpace = await prisma.sportSpace.update({
             where: {
                 id: spaceId,
             },
             data: {
-                planningOnGoing: space.planningOnGoing + 1,
+                planningOnGoing: [
+                    ...(space.planningOnGoing as string[]),
+                    req.user.email,
+                ],
                 timeOut: 1800,
             },
         })
@@ -160,7 +171,7 @@ export const setupRestHandlers = (
                 link,
                 coords,
                 price,
-                planningOnGoing: 0,
+                planningOnGoing: [],
                 timeOut: 1800,
             },
         })

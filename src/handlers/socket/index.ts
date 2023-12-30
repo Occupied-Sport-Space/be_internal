@@ -13,8 +13,8 @@ export const setupSocketHandlers = (io: Server, prisma: PrismaClient) => {
         prisma.sportSpace
             .findMany({
                 where: {
-                    NOT: {
-                        planningOnGoing: 0,
+                    planningOnGoing: {
+                        not: [],
                     },
                 },
             })
@@ -44,7 +44,7 @@ export const setupSocketHandlers = (io: Server, prisma: PrismaClient) => {
                                     id: space.id,
                                 },
                                 data: {
-                                    planningOnGoing: 0,
+                                    planningOnGoing: [],
                                     timeOut: 1800,
                                 },
                             })
