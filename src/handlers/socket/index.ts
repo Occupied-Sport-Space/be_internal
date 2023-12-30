@@ -18,17 +18,25 @@ export const setupSocketHandlers = (io: Server, prisma: PrismaClient) => {
                     },
                 },
             })
-            .then((spaces) => {
+            .then((spaces): void => {
                 spaces.forEach((space) => {
                     if (space.timeOut > 0) {
-                        prisma.sportSpace.update({
-                            where: {
-                                id: space.id,
-                            },
-                            data: {
-                                timeOut: space.timeOut - 60,
-                            },
-                        })
+                        prisma.sportSpace
+                            .update({
+                                where: {
+                                    id: space.id,
+                                },
+                                data: {
+                                    timeOut: space.timeOut - 60,
+                                },
+                            })
+                            .then((updatedSpace) => {
+                                console.log(
+                                    'Timer',
+                                    updatedSpace.timeOut,
+                                    updatedSpace.name
+                                )
+                            })
                     } else {
                         prisma.sportSpace
                             .update({

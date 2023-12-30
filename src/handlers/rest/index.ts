@@ -87,6 +87,7 @@ export const setupRestHandlers = (
 
     app.get('/spaces', verifyToken, async (_, res) => {
         const spaces = await prisma.sportSpace.findMany()
+        console.log(spaces)
         res.send(spaces)
     })
 
