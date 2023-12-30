@@ -11,16 +11,18 @@ datasource db {
 }
 
 model SportSpace {
-  id           String @id @default(uuid())
-  logo         String
-  name         String
-  link         String
-  coords       Json
-  price        Json
-  availability Json
-  address      String
-  markerLogo   String
-  maxAvailable Int
+  id              String @id @default(uuid())
+  logo            String
+  name            String
+  link            String
+  coords          Json
+  price           Json
+  availability    Json
+  address         String
+  markerLogo      String
+  maxAvailable    Int
+  planningOnGoing Int
+  timeOut         Int
 }
 
 model User {

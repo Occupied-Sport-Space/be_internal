@@ -2,8 +2,9 @@ import { PrismaClient } from '@prisma/client'
 import { Express } from 'express'
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
-import { verifyToken } from '../../middleware/auth'
 import winston from 'winston'
+import { Server } from 'socket.io'
+import { verifyToken } from '../../middleware/auth'
 
 const logger = winston.createLogger({
     // Log only if level is less than (meaning more severe) or equal to this
@@ -22,7 +23,11 @@ const logger = winston.createLogger({
     ],
 })
 
-export const setupRestHandlers = (app: Express, prisma: PrismaClient) => {
+export const setupRestHandlers = (
+    app: Express,
+    prisma: PrismaClient,
+    io: Server
+) => {
     app.use((req, _, next) => {
         logger.info(`${req.method} request for ${req.url}`)
         next()
@@ -32,6 +37,41 @@ export const setupRestHandlers = (app: Express, prisma: PrismaClient) => {
         res.send({
             message: 'Welcome to the OSS API',
         })
+    })
+
+    app.patch('/spaces', verifyToken, async (req: any, res) => {
+        const { spaceId } = req.body
+
+        if (!spaceId) {
+            return res.status(400).send({
+                error: 'SPACE_ID_REQUIRED',
+            })
+        }
+
+        const space = await prisma.sportSpace.findFirst({
+            where: {
+                id: spaceId,
+            },
+        })
+
+        if (!space) {
+            return res.status(400).send({
+                error: 'SPACE_NOT_FOUND',
+            })
+        }
+
+        const updatedSpace = await prisma.sportSpace.update({
+            where: {
+                id: spaceId,
+            },
+            data: {
+                planningOnGoing: space.planningOnGoing + 1,
+                timeOut: 1800,
+            },
+        })
+
+        io.emit('update', updatedSpace)
+        return res.status(200).send(updatedSpace)
     })
 
     app.get('/spaces', verifyToken, async (_, res) => {
@@ -120,6 +160,8 @@ export const setupRestHandlers = (app: Express, prisma: PrismaClient) => {
                 link,
                 coords,
                 price,
+                planningOnGoing: 0,
+                timeOut: 1800,
             },
         })
 

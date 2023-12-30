@@ -17,7 +17,7 @@ const main = async () => {
     const io = new Server(httpServer)
 
     setupSocketHandlers(io, prisma);
-    setupRestHandlers(app, prisma);
+    setupRestHandlers(app, prisma, io)
 
     httpServer.listen(PORT)
     console.log(`Server connected on port ${PORT}`)

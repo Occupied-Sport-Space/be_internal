@@ -1,5 +1,5 @@
-import { PrismaClient } from "@prisma/client"
-import { Server } from "socket.io"
+import { PrismaClient } from '@prisma/client'
+import { Server } from 'socket.io'
 
 interface CountInstance {
     count: number
@@ -9,6 +9,46 @@ interface CountInstance {
 }
 
 export const setupSocketHandlers = (io: Server, prisma: PrismaClient) => {
+    setInterval(() => {
+        prisma.sportSpace.findMany().then((spaces) => {
+            spaces.forEach((space) => {
+                if (space.planningOnGoing === 0) return
+                if (space.timeOut > 0) {
+                    prisma.sportSpace
+                        .update({
+                            where: {
+                                id: space.id,
+                            },
+                            data: {
+                                timeOut: space.timeOut - 10,
+                            },
+                        })
+                        .then((updatedSpace) => {
+                            console.log(
+                                'Timer',
+                                updatedSpace.timeOut,
+                                updatedSpace.name
+                            )
+                        })
+                } else {
+                    prisma.sportSpace
+                        .update({
+                            where: {
+                                id: space.id,
+                            },
+                            data: {
+                                planningOnGoing: 0,
+                                timeOut: 1800,
+                            },
+                        })
+                        .then((updatedSpace) => {
+                            io.emit('update', updatedSpace)
+                        })
+                }
+            })
+        })
+    }, 10000)
+
     io.on('connection', (socket) => {
         console.log('user connected!')
 
@@ -50,7 +90,7 @@ export const setupSocketHandlers = (io: Server, prisma: PrismaClient) => {
                             }
                         })
                 } else {
-                    socket.disconnect();
+                    socket.disconnect()
                 }
             }
         )
