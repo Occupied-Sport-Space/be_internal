@@ -21,22 +21,14 @@ export const setupSocketHandlers = (io: Server, prisma: PrismaClient) => {
             .then((spaces) => {
                 spaces.forEach((space) => {
                     if (space.timeOut > 0) {
-                        prisma.sportSpace
-                            .update({
-                                where: {
-                                    id: space.id,
-                                },
-                                data: {
-                                    timeOut: space.timeOut - 10,
-                                },
-                            })
-                            .then((updatedSpace) => {
-                                console.log(
-                                    'Timer',
-                                    updatedSpace.timeOut,
-                                    updatedSpace.name
-                                )
-                            })
+                        prisma.sportSpace.update({
+                            where: {
+                                id: space.id,
+                            },
+                            data: {
+                                timeOut: space.timeOut - 60,
+                            },
+                        })
                     } else {
                         prisma.sportSpace
                             .update({
@@ -54,7 +46,7 @@ export const setupSocketHandlers = (io: Server, prisma: PrismaClient) => {
                     }
                 })
             })
-    }, 10000)
+    }, 60000)
 
     io.on('connection', (socket) => {
         console.log('user connected!')
