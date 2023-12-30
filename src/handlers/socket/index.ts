@@ -10,43 +10,50 @@ interface CountInstance {
 
 export const setupSocketHandlers = (io: Server, prisma: PrismaClient) => {
     setInterval(() => {
-        prisma.sportSpace.findMany().then((spaces) => {
-            spaces.forEach((space) => {
-                if (space.planningOnGoing === 0) return
-                if (space.timeOut > 0) {
-                    prisma.sportSpace
-                        .update({
-                            where: {
-                                id: space.id,
-                            },
-                            data: {
-                                timeOut: space.timeOut - 10,
-                            },
-                        })
-                        .then((updatedSpace) => {
-                            console.log(
-                                'Timer',
-                                updatedSpace.timeOut,
-                                updatedSpace.name
-                            )
-                        })
-                } else {
-                    prisma.sportSpace
-                        .update({
-                            where: {
-                                id: space.id,
-                            },
-                            data: {
-                                planningOnGoing: 0,
-                                timeOut: 1800,
-                            },
-                        })
-                        .then((updatedSpace) => {
-                            io.emit('update', updatedSpace)
-                        })
-                }
+        prisma.sportSpace
+            .findMany({
+                where: {
+                    NOT: {
+                        planningOnGoing: 0,
+                    },
+                },
             })
-        })
+            .then((spaces) => {
+                spaces.forEach((space) => {
+                    if (space.timeOut > 0) {
+                        prisma.sportSpace
+                            .update({
+                                where: {
+                                    id: space.id,
+                                },
+                                data: {
+                                    timeOut: space.timeOut - 10,
+                                },
+                            })
+                            .then((updatedSpace) => {
+                                console.log(
+                                    'Timer',
+                                    updatedSpace.timeOut,
+                                    updatedSpace.name
+                                )
+                            })
+                    } else {
+                        prisma.sportSpace
+                            .update({
+                                where: {
+                                    id: space.id,
+                                },
+                                data: {
+                                    planningOnGoing: 0,
+                                    timeOut: 1800,
+                                },
+                            })
+                            .then((updatedSpace) => {
+                                io.emit('update', updatedSpace)
+                            })
+                    }
+                })
+            })
     }, 10000)
 
     io.on('connection', (socket) => {
