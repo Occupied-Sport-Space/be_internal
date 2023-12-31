@@ -20,38 +20,31 @@ export const setupSocketHandlers = (io: Server, prisma: PrismaClient) => {
             })
             .then((spaces): void => {
                 spaces.forEach((space) => {
-                    if (space.timeOut > 0) {
-                        prisma.sportSpace
-                            .update({
-                                where: {
-                                    id: space.id,
-                                },
-                                data: {
-                                    timeOut: space.timeOut - 60,
-                                },
-                            })
-                            .then((updatedSpace) => {
-                                console.log(
-                                    'Timer',
-                                    updatedSpace.timeOut,
-                                    updatedSpace.name
-                                )
-                            })
-                    } else {
-                        prisma.sportSpace
-                            .update({
-                                where: {
-                                    id: space.id,
-                                },
-                                data: {
-                                    planningOnGoing: [],
-                                    timeOut: 1800,
-                                },
-                            })
-                            .then((updatedSpace) => {
-                                io.emit('update', updatedSpace)
-                            })
-                    }
+                    const updatedPlanningOnGoing = (
+                        space.planningOnGoing as any
+                    )
+                        .filter(({ time }: any) => time > 0)
+                        .map((plan: { time: number; email: string }) => ({
+                            ...plan,
+                            time: plan.time - 60,
+                        }))
+
+                    prisma.sportSpace
+                        .update({
+                            where: {
+                                id: space.id,
+                            },
+                            data: {
+                                planningOnGoing: updatedPlanningOnGoing,
+                            },
+                        })
+                        .then((updatedSpace) => {
+                            console.log(
+                                'Timer',
+                                updatedSpace.planningOnGoing,
+                                updatedSpace.name
+                            )
+                        })
                 })
             })
     }, 60000)

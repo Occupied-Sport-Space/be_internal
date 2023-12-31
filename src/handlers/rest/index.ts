@@ -75,9 +75,8 @@ export const setupRestHandlers = (
             data: {
                 planningOnGoing: [
                     ...(space.planningOnGoing as string[]),
-                    req.user.email,
+                    { email: req.user.email, time: 1800 },
                 ],
-                timeOut: 1800,
             },
         })
 
@@ -87,7 +86,6 @@ export const setupRestHandlers = (
 
     app.get('/spaces', verifyToken, async (_, res) => {
         const spaces = await prisma.sportSpace.findMany()
-        console.log(spaces)
         res.send(spaces)
     })
 
@@ -173,7 +171,6 @@ export const setupRestHandlers = (
                 coords,
                 price,
                 planningOnGoing: [],
-                timeOut: 1800,
             },
         })
 

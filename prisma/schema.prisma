@@ -22,7 +22,6 @@ model SportSpace {
   markerLogo      String
   maxAvailable    Int
   planningOnGoing Json
-  timeOut         Int
 }
 
 model User {
